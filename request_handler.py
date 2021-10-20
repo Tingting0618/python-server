@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from animals import get_all_animals, get_single_animal,create_animal,delete_animal,update_animal
-from customers import get_all_customers,get_customers_by_email
+from customers import get_all_customers,get_customers_by_email,get_single_customer
 from locations import get_all_locations
 from employees import get_all_employees
 import json
