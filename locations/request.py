@@ -1,16 +1,6 @@
+import sqlite3
 import json
-
-LOCATIONS = [
-    {
-        "id": 1,
-        "name": "Location1",
-        "address": "Nashville Road 1"
-    },
-    {
-        "id": 2,
-        "name": "Location2",
-        "address": "Nashville Road 2"
-    }]
+from models import Location
 
 
 def get_all_locations():
@@ -69,3 +59,16 @@ def update_location(id, new_location):
             # Found the animal. Update the value.
             LOCATIONS[index] = new_location
             break
+
+
+# LOCATIONS = [
+#     {
+#         "id": 1,
+#         "name": "Location1",
+#         "address": "Nashville Road 1"
+#     },
+#     {
+#         "id": 2,
+#         "name": "Location2",
+#         "address": "Nashville Road 2"
+#     }]
