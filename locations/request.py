@@ -41,6 +41,8 @@ def get_all_locations():
     return json.dumps(locations)
 
 # Function with a single parameter
+
+
 def get_single_location(id):
     with sqlite3.connect("./kennel.db") as conn:
         conn.row_factory = sqlite3.Row
@@ -54,7 +56,7 @@ def get_single_location(id):
             l.address
         FROM location l
         WHERE l.id = ?
-        """, ( id, ))
+        """, (id, ))
 
         # Load the single result into memory
         data = db_cursor.fetchone()
@@ -62,25 +64,46 @@ def get_single_location(id):
         # Create an animal instance from the current row
         location = Location(data['id'], data['name'], data['address'])
 
-
         return json.dumps(location.__dict__)
 
 
-def create_location(location):
-    # Get the id value of the last animal in the list
-    max_id = LOCATIONS[-1]["id"]
+def create_location(new_location):
+    with sqlite3.connect("./kennel.db") as conn:
+        db_cursor = conn.cursor()
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
+        db_cursor.execute("""
+        INSERT INTO location
+            ( name, address)
+        VALUES
+            ( ?, ?);
+        """, (new_location['name'], new_location['address'],
+              ))
 
-    # Add an `id` property to the animal dictionary
-    location["id"] = new_id
+        # The `lastrowid` property on the cursor will return
+        # the primary key of the last thing that got added to
+        # the database.
+        id = db_cursor.lastrowid
 
-    # Add the animal dictionary to the list
-    LOCATIONS.append(location)
+        # Add the `id` property to the animal dictionary that
+        # was sent by the client so that the client sees the
+        # primary key in the response.
+        new_location['id'] = id
 
-    # Return the dictionary with `id` property added
-    return location
+# def create_location(location):
+#     # Get the id value of the last animal in the list
+#     max_id = LOCATIONS[-1]["id"]
+
+#     # Add 1 to whatever that number is
+#     new_id = max_id + 1
+
+#     # Add an `id` property to the animal dictionary
+#     location["id"] = new_id
+
+#     # Add the animal dictionary to the list
+#     LOCATIONS.append(location)
+
+#     # Return the dictionary with `id` property added
+#     return location
 
 # def delete_location(id):
 #     # Initial -1 value for location index, in case one isn't found
@@ -96,6 +119,7 @@ def create_location(location):
 #     # If the animal was found, use pop(int) to remove it from list
 #     if location_index >= 0:
 #         LOCATIONS.pop(location_index)
+
 
 def delete_location(id):
     with sqlite3.connect("./kennel.db") as conn:
@@ -118,7 +142,7 @@ def update_location(id, new_location):
                 address = ?,
         WHERE id = ?
         """, (new_location['name'], new_location['address'],
-               id, ))
+              id, ))
 
         # Were any rows affected?
         # Did the client send an `id` that exists?

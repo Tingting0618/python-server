@@ -96,21 +96,30 @@ def get_customers_by_email(email):
 
     return json.dumps(customers)
 
-def create_customer(customer):
-    # Get the id value of the last animal in the list
-    max_id = CUSTOMERS[-1]["id"]
+def create_customer(new_customer):
+    with sqlite3.connect("./kennel.db") as conn:
+        db_cursor = conn.cursor()
 
-    # Add 1 to whatever that number is
-    new_id = max_id + 1
+        db_cursor.execute("""
+        INSERT INTO customer
+            ( name, address, email, password)
+        VALUES
+            ( ?, ?, ?, ?);
+        """, (new_customer['name'], new_customer['address'],
+              new_customer['email'], new_customer['password'], ))
 
-    # Add an `id` property to the animal dictionary
-    customer["id"] = new_id
+        # The `lastrowid` property on the cursor will return
+        # the primary key of the last thing that got added to
+        # the database.
+        id = db_cursor.lastrowid
 
-    # Add the animal dictionary to the list
-    CUSTOMERS.append(customer)
+        # Add the `id` property to the animal dictionary that
+        # was sent by the client so that the client sees the
+        # primary key in the response.
+        new_customer['id'] = id
 
-    # Return the dictionary with `id` property added
-    return customer
+
+    return json.dumps(new_customer)
 
 # def delete_customer(id):
 #     # Initial -1 value for animal index, in case one isn't found
