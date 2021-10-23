@@ -4,4 +4,4 @@ class Employee():
         self.id = id
         self.name = name
         self.address = address
-        self.location = location
+        self.location = None
