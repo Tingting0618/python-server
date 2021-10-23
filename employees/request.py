@@ -35,7 +35,7 @@ def get_all_employees():
             # exact order of the parameters defined in the
             # Customer class above.
             employee = Employee(row['id'], row['name'], row['address'],
-                            row['location_id'])
+                                row['location_id'])
 
             employees.append(employee.__dict__)
 
@@ -43,6 +43,8 @@ def get_all_employees():
     return json.dumps(employees)
 
 # Function with a single parameter
+
+
 def get_single_employee(id):
     with sqlite3.connect("./kennel.db") as conn:
         conn.row_factory = sqlite3.Row
@@ -57,15 +59,16 @@ def get_single_employee(id):
             e.location_id
         FROM employee e
         WHERE e.id = ?
-        """, ( id, ))
+        """, (id, ))
 
         # Load the single result into memory
         data = db_cursor.fetchone()
 
         # Create an animal instance from the current row
         employee = Employee(data['id'], data['name'], data['address'],
-                        data['location_id'])
+                            data['location_id'])
         return json.dumps(employee.__dict__)
+
 
 def get_employees_by_location(location_id):
 
@@ -82,17 +85,18 @@ def get_employees_by_location(location_id):
             e.location_id
         FROM employee e
         WHERE e.location_id = ?
-        """, ( location_id, ))
+        """, (location_id, ))
 
         employees = []
         dataset = db_cursor.fetchall()
 
         for row in dataset:
-            employee = Employee(row['id'], row['name'], row['address'], 
-            row['location_id'])
+            employee = Employee(row['id'], row['name'], row['address'],
+                                row['location_id'])
             employees.append(employee.__dict__)
 
     return json.dumps(employees)
+
 
 def create_employee(employee):
     # Get the id value of the last animal in the list
@@ -125,6 +129,7 @@ def create_employee(employee):
 #     if employee_index >= 0:
 #         EMPLOYEES.pop(employee_index)
 
+
 def delete_employee(id):
     with sqlite3.connect("./kennel.db") as conn:
         db_cursor = conn.cursor()
@@ -134,15 +139,30 @@ def delete_employee(id):
         WHERE id = ?
         """, (id, ))
 
-def update_employee(id, new_employee):
-    # Iterate the ANIMALS list, but use enumerate() so that
-    # you can access the index value of each item.
-    for index, employee in enumerate(EMPLOYEES):
-        if employee["id"] == id:
-            # Found the animal. Update the value.
-            EMPLOYEES[index] = new_employee
-            break
 
+def update_employee(id, new_employee):
+    with sqlite3.connect("./kennel.db") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        UPDATE Employee
+            SET
+                name = ?,
+                address = ?,
+                location_id = ?
+        WHERE id = ?
+        """, (new_employee['name'], new_employee['address'],
+              new_employee['location_id'], id, ))
+
+        # Were any rows affected?
+        # Did the client send an `id` that exists?
+        rows_affected = db_cursor.rowcount
+    if rows_affected == 0:
+        # Forces 404 response by main module
+        return False
+    else:
+        # Forces 204 response by main module
+        return True
 
 # EMPLOYEES = [
 #     {
