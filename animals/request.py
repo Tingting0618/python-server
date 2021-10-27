@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Animal, Location, Customer, customer
+from models import Animal, Location, Customer
 
 # def get_all_animals():
 #     return ANIMALS
